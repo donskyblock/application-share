@@ -1,0 +1,40 @@
+[Unit]
+Description=Application Share - Remote GUI Application Platform
+After=network.target graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=simple
+User=appshare
+Group=appshare
+WorkingDirectory=/opt/application-share
+ExecStart=/opt/application-share/start-production.sh
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=application-share
+
+# Environment variables
+Environment=PORT=3000
+Environment=NODE_ENV=production
+Environment=DISPLAY=:99
+Environment=MAX_CONCURRENT_APPS=10
+Environment=ALLOWED_APPLICATIONS=firefox,code,cursor,gedit,libreoffice,gnome-terminal
+Environment=TEMP_DIR=/tmp/appshare
+Environment=USER_HOME_DIR=/home/appshare
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/application-share/data /opt/application-share/logs /tmp/appshare
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target

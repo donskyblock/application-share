@@ -1,0 +1,173 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'docs/**'
+      - '*.md'
+      - 'server/**'
+      - 'client/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - '*.md'
+      - 'server/**'
+      - 'client/**'
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install mkdocs mkdocs-material mkdocs-swagger-ui-tag mkdocs-mermaid2-plugin
+    
+    - name: Generate API documentation
+      run: |
+        # Generate OpenAPI spec from FastAPI
+        python -c "
+        import json
+        from main import app
+        from fastapi.openapi.utils import get_openapi
+        
+        openapi_schema = get_openapi(
+            title='Application Share API',
+            version='1.0.0',
+            description='Complete API for Application Share remote desktop platform',
+            routes=app.routes,
+        )
+        
+        with open('docs/api/openapi.json', 'w') as f:
+            json.dump(openapi_schema, f, indent=2)
+        "
+    
+    - name: Generate code documentation
+      run: |
+        # Generate Python docstrings to markdown
+        python -c "
+        import os
+        import ast
+        import inspect
+        
+        def extract_docstrings(file_path, output_path):
+            with open(file_path, 'r') as f:
+                tree = ast.parse(f.read())
+            
+            with open(output_path, 'w') as out:
+                out.write(f'# {os.path.basename(file_path)}\n\n')
+                
+                for node in ast.walk(tree):
+                    if isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)):
+                        if node.docstring:
+                            out.write(f'## {node.name}\n\n')
+                            out.write(f'{node.docstring}\n\n')
+        
+        # Generate docs for server modules
+        os.makedirs('docs/api/code', exist_ok=True)
+        for root, dirs, files in os.walk('server'):
+            for file in files:
+                if file.endswith('.py'):
+                    file_path = os.path.join(root, file)
+                    output_path = f'docs/api/code/{file.replace(".py", ".md")}'
+                    extract_docstrings(file_path, output_path)
+        "
+    
+    - name: Build MkDocs
+      run: |
+        mkdocs build --clean --site-dir ./site
+    
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./site
+
+  update-readme:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Update README badges
+      run: |
+        # Update README with latest badges and stats
+        python -c "
+        import requests
+        import json
+        from datetime import datetime
+        
+        # Get repository stats
+        response = requests.get('https://api.github.com/repos/donskyblock/application-share')
+        repo_data = response.json()
+        
+        # Generate updated README content
+        readme_content = '''# Application Share
+
+[![Build Status](https://github.com/donskyblock/application-share/workflows/CI/badge.svg)](https://github.com/donskyblock/application-share/actions)
+[![Documentation Status](https://github.com/donskyblock/application-share/workflows/Documentation/badge.svg)](https://github.com/donskyblock/application-share/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Node.js Version](https://img.shields.io/badge/node.js-16+-green.svg)](https://nodejs.org/)
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://www.docker.com/)
+[![Kubernetes](https://img.shields.io/badge/kubernetes-ready-blue.svg)](https://kubernetes.io/)
+
+[![GitHub stars](https://img.shields.io/github/stars/donskyblock/application-share.svg?style=social&label=Star)](https://github.com/donskyblock/application-share)
+[![GitHub forks](https://img.shields.io/github/forks/donskyblock/application-share.svg?style=social&label=Fork)](https://github.com/donskyblock/application-share/fork)
+[![GitHub watchers](https://img.shields.io/github/watchers/donskyblock/application-share.svg?style=social&label=Watch)](https://github.com/donskyblock/application-share)
+
+**Last Updated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+**Repository Stats**: {repo_data['stargazers_count']} stars, {repo_data['forks_count']} forks, {repo_data['open_issues_count']} open issues
+
+A comprehensive web-based platform that allows you to run GUI applications on a server and display them in your browser, with advanced features like Hyprland-style tiling, multi-user collaboration, and enterprise-grade capabilities.
+'''
+        
+        # Write updated README
+        with open('README.md', 'w') as f:
+            f.write(readme_content)
+        "
+    
+    - name: Commit changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add README.md
+        git diff --staged --quiet || git commit -m "Update README with latest stats and badges"
+        git push
+
+  generate-changelog:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Generate Changelog
+      uses: conventional-changelog-action@v3
+      with:
+        release-count: 0
+        output-file: CHANGELOG.md
+        config-file: .github/conventional-changelog-config.js
+    
+    - name: Commit Changelog
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add CHANGELOG.md
+        git diff --staged --quiet || git commit -m "Update CHANGELOG.md"
+        git push

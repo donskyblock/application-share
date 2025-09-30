@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: application-share
+  namespace: application-share
+  labels:
+    app: application-share
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: application-share
+  template:
+    metadata:
+      labels:
+        app: application-share
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: application-share
+        image: application-share:latest
+        ports:
+        - containerPort: 3000
+          name: http
+        - containerPort: 5900
+          name: vnc
+        - containerPort: 3389
+          name: rdp
+        - containerPort: 8765
+          name: stream
+        - containerPort: 8766
+          name: audio
+        env:
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: application-share-secrets
+              key: JWT_SECRET
+        - name: SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: application-share-secrets
+              key: SESSION_SECRET
+        - name: ADMIN_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: application-share-secrets
+              key: ADMIN_USERNAME
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application-share-secrets
+              key: ADMIN_PASSWORD
+        - name: VNC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application-share-secrets
+              key: VNC_PASSWORD
+        - name: RDP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: application-share-secrets
+              key: RDP_PASSWORD
+        envFrom:
+        - configMapRef:
+            name: application-share-config
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: data-volume
+          mountPath: /app/data
+        - name: logs-volume
+          mountPath: /app/logs
+        - name: temp-volume
+          mountPath: /tmp/appshare
+        - name: x11-socket
+          mountPath: /tmp/.X11-unix
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: application-share-data
+      - name: logs-volume
+        persistentVolumeClaim:
+          claimName: application-share-logs
+      - name: temp-volume
+        emptyDir: {}
+      - name: x11-socket
+        hostPath:
+          path: /tmp/.X11-unix
+          type: DirectoryOrCreate
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+        effect: "NoSchedule"
