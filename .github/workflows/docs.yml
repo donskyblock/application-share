@@ -106,7 +106,7 @@ jobs:
     - name: Update README badges
       run: |
         # Update README with latest badges and stats
-        python -c "
+        python3 << 'EOF'
         import requests
         import json
         from datetime import datetime
@@ -116,7 +116,7 @@ jobs:
         repo_data = response.json()
         
         # Generate updated README content
-        readme_content = '''# Application Share
+        readme_content = f"""# Application Share
 
 [![Build Status](https://github.com/donskyblock/application-share/workflows/CI/badge.svg)](https://github.com/donskyblock/application-share/actions)
 [![Documentation Status](https://github.com/donskyblock/application-share/workflows/Documentation/badge.svg)](https://github.com/donskyblock/application-share/actions)
@@ -134,12 +134,12 @@ jobs:
 **Repository Stats**: {repo_data['stargazers_count']} stars, {repo_data['forks_count']} forks, {repo_data['open_issues_count']} open issues
 
 A comprehensive web-based platform that allows you to run GUI applications on a server and display them in your browser, with advanced features like Hyprland-style tiling, multi-user collaboration, and enterprise-grade capabilities.
-'''
+"""
         
         # Write updated README
         with open('README.md', 'w') as f:
             f.write(readme_content)
-        "
+        EOF
     
     - name: Commit changes
       run: |
