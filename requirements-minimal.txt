@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+python-socketio
+python-multipart
+python-dotenv
+passlib[bcrypt]
+python-jose[cryptography]
+websockets
+pillow
+opencv-python-headless
+numpy
+psutil
+pydantic
+httpx
+aiofiles
+jinja2
