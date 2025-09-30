@@ -30,9 +30,9 @@ RUN useradd -m -s /bin/bash appuser
 # Set working directory
 WORKDIR /app
 
-# Install only essential Python packages
+# Install essential Python packages
 RUN pip install --upgrade pip && \
-    pip install fastapi uvicorn python-socketio python-multipart python-dotenv
+    pip install fastapi uvicorn python-socketio python-multipart python-dotenv passlib python-jose websockets pillow opencv-python-headless numpy psutil pydantic httpx aiofiles jinja2
 
 # Copy application code
 COPY . .
