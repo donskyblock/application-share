@@ -5,16 +5,19 @@ FROM node:18-alpine AS frontend-builder
 WORKDIR /app/client
 
 # Copy package files
-COPY client/package*.json ./
+COPY client/package.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies with legacy peer deps to avoid conflicts
+RUN npm install --legacy-peer-deps --verbose || (echo "npm install failed, trying with --force" && npm install --force --verbose)
 
 # Copy source code
 COPY client/ ./
 
+# Debug: Show what files we have
+RUN ls -la
+
 # Build the frontend
-RUN npm run build
+RUN npm run build || (echo "Build failed, showing error details" && cat package.json && exit 1)
 
 # Python backend stage
 FROM python:3.11-slim
