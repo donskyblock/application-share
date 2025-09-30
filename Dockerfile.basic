@@ -1,0 +1,63 @@
+# Basic Dockerfile for Application Share - Minimal Dependencies
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    x11-utils \
+    xdotool \
+    imagemagick \
+    xvfb \
+    x11vnc \
+    xrdp \
+    fluxbox \
+    procps \
+    curl \
+    netcat-openbsd \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app user
+RUN useradd -m -s /bin/bash appuser
+
+# Set working directory
+WORKDIR /app
+
+# Install only essential Python packages
+RUN pip install --upgrade pip && \
+    pip install fastapi uvicorn python-socketio python-multipart python-dotenv
+
+# Copy application code
+COPY . .
+
+# Create a simple static frontend
+RUN mkdir -p client/build/static/css client/build/static/js client/build/static/media
+RUN echo '<!DOCTYPE html><html><head><title>Application Share</title><style>body{font-family:Arial,sans-serif;margin:40px;background:#f5f5f5;}h1{color:#333;}.container{background:white;padding:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}</style></head><body><div class="container"><h1>🚀 Application Share</h1><p>Server is running! The backend API is available.</p><p>This is a simplified version without the full React frontend.</p></div></body></html>' > client/build/index.html
+
+# Create necessary directories
+RUN mkdir -p data logs && \
+    chown -R appuser:appuser /app
+
+# Create startup script
+COPY docker/start.sh /start.sh
+RUN chmod +x /start.sh
+
+# Switch to app user
+USER appuser
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/ || exit 1
+
+# Start the application
+CMD ["/start.sh"]
