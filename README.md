@@ -54,7 +54,26 @@ A comprehensive web-based platform that allows you to run GUI applications on a 
 
 ## 🚀 Quick Start
 
-### Option 1: Complete Deployment (Recommended)
+### Option 1: Docker Hub (Easiest)
+
+```bash
+# Pull and run the pre-built image
+docker pull ghcr.io/donskyblock/application-share:latest
+
+docker run -d \
+  --name application-share \
+  -p 3000:3000 \
+  -p 5900:5900 \
+  -p 3389:3389 \
+  -e ADMIN_PASSWORD=yourpassword123 \
+  ghcr.io/donskyblock/application-share:latest
+
+# Access at http://localhost:3000
+# VNC: localhost:5900 (password: vncpass123)
+# RDP: localhost:3389 (password: rdppass123)
+```
+
+### Option 2: Complete Deployment (Recommended)
 
 1. **Clone and deploy everything**
    ```bash
