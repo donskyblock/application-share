@@ -1,0 +1,176 @@
+/* Custom styles for Application Share documentation */
+
+/* Brand colors */
+:root {
+  --md-primary-fg-color: #3f51b5;
+  --md-primary-fg-color--light: #757de8;
+  --md-primary-fg-color--dark: #002984;
+  --md-accent-fg-color: #ff4081;
+}
+
+/* Custom header styling */
+.md-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Feature cards */
+.feature-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  background: #fafafa;
+  transition: box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Code blocks */
+.highlight .c1 {
+  color: #6a737d;
+  font-style: italic;
+}
+
+/* API endpoint styling */
+.api-endpoint {
+  background: #f6f8fa;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.api-endpoint .method {
+  font-weight: bold;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  color: white;
+  font-size: 0.8rem;
+}
+
+.api-endpoint .method.get {
+  background: #28a745;
+}
+
+.api-endpoint .method.post {
+  background: #007bff;
+}
+
+.api-endpoint .method.put {
+  background: #ffc107;
+  color: #000;
+}
+
+.api-endpoint .method.delete {
+  background: #dc3545;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status-badge.completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.in-progress {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.planned {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+/* Mermaid diagram styling */
+.mermaid {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+/* Custom admonitions */
+.admonition.important {
+  border-left: 4px solid #ff4081;
+}
+
+.admonition.important .admonition-title {
+  background: rgba(255, 64, 129, 0.1);
+  color: #ff4081;
+}
+
+/* Navigation improvements */
+.md-nav__item--nested > .md-nav__link {
+  font-weight: 600;
+}
+
+/* Table styling */
+.md-typeset table:not([class]) {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.md-typeset table:not([class]) th {
+  background: #f6f8fa;
+  font-weight: 600;
+}
+
+/* Code copy button */
+.highlight .copy {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  background: rgba(0,0,0,0.1);
+  border: none;
+  border-radius: 3px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.highlight:hover .copy {
+  opacity: 1;
+}
+
+/* Responsive improvements */
+@media screen and (max-width: 76.1875em) {
+  .feature-card {
+    margin: 0.5rem 0;
+    padding: 1rem;
+  }
+}
+
+/* Dark mode adjustments */
+[data-md-color-scheme="slate"] .feature-card {
+  background: #1e1e1e;
+  border-color: #404040;
+}
+
+[data-md-color-scheme="slate"] .api-endpoint {
+  background: #1e1e1e;
+  border-color: #404040;
+}
+
+/* Print styles */
+@media print {
+  .feature-card {
+    break-inside: avoid;
+    border: 1px solid #000;
+  }
+  
+  .api-endpoint {
+    break-inside: avoid;
+  }
+}
