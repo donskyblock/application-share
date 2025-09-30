@@ -123,24 +123,25 @@ jobs:
     - name: Update documentation with Docker info
       run: |
         # Update README with Docker pull command
-        echo "
-## 🐳 Docker Hub
-
-Pull the latest image:
-\`\`\`bash
-docker pull ghcr.io/donskyblock/application-share:latest
-\`\`\`
-
-Run with Docker Compose:
-\`\`\`bash
-docker-compose up -d
-\`\`\`
-
-Available tags:
-- \`latest\` - Latest stable release
-- \`v1.0.0\` - Specific version
-- \`main\` - Latest from main branch
-        " >> README.md
+        cat >> README.md << 'EOF'
+        
+        ## 🐳 Docker Hub
+        
+        Pull the latest image:
+        ```bash
+        docker pull ghcr.io/donskyblock/application-share:latest
+        ```
+        
+        Run with Docker Compose:
+        ```bash
+        docker-compose up -d
+        ```
+        
+        Available tags:
+        - `latest` - Latest stable release
+        - `v1.0.0` - Specific version
+        - `main` - Latest from main branch
+        EOF
 
     - name: Commit and push documentation updates
       run: |
