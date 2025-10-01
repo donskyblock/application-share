@@ -14,7 +14,7 @@ import json
 
 class AuthManager:
     def __init__(self):
-        self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        self.pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
         self.secret_key = os.getenv("JWT_SECRET", "your-secret-key-here")
         self.algorithm = "HS256"
         self.access_token_expire_minutes = 30

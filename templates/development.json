@@ -1,0 +1,75 @@
+{
+  "name": "Development Environment",
+  "description": "Complete development setup with IDE, terminal, and tools",
+  "icon": "\ud83d\udcbb",
+  "category": "development",
+  "applications": [
+    {
+      "name": "code",
+      "display_name": "VS Code",
+      "args": [
+        "--new-window"
+      ],
+      "env": {
+        "DISPLAY": ":99"
+      }
+    },
+    {
+      "name": "gnome-terminal",
+      "display_name": "Terminal",
+      "args": [
+        "--maximize"
+      ],
+      "env": {
+        "DISPLAY": ":99"
+      }
+    },
+    {
+      "name": "firefox",
+      "display_name": "Firefox",
+      "args": [
+        "--new-window"
+      ],
+      "env": {
+        "DISPLAY": ":99"
+      }
+    }
+  ],
+  "layout": {
+    "type": "tiled",
+    "windows": [
+      {
+        "app": "code",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "width": 0.6,
+          "height": 1.0
+        }
+      },
+      {
+        "app": "gnome-terminal",
+        "position": {
+          "x": 0.6,
+          "y": 0,
+          "width": 0.4,
+          "height": 0.5
+        }
+      },
+      {
+        "app": "firefox",
+        "position": {
+          "x": 0.6,
+          "y": 0.5,
+          "width": 0.4,
+          "height": 0.5
+        }
+      }
+    ]
+  },
+  "settings": {
+    "auto_start": true,
+    "persistent": true,
+    "shared": true
+  }
+}

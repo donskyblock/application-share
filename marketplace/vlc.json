@@ -1,0 +1,27 @@
+{
+  "id": "vlc",
+  "name": "VLC Media Player",
+  "description": "Media player for audio and video",
+  "version": "latest",
+  "category": "multimedia",
+  "icon": "\ud83c\udfac",
+  "author": "VideoLAN",
+  "license": "GPL",
+  "size": "80MB",
+  "dependencies": [],
+  "install_command": "apt-get install -y vlc",
+  "uninstall_command": "apt-get remove -y vlc",
+  "executable": "vlc",
+  "args": [],
+  "env": {
+    "DISPLAY": ":99"
+  },
+  "tags": [
+    "media",
+    "video",
+    "audio"
+  ],
+  "rating": 4.6,
+  "downloads": 1200000,
+  "featured": true
+}

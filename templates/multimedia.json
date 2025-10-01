@@ -1,0 +1,69 @@
+{
+  "name": "Multimedia Studio",
+  "description": "Audio, video, and image editing suite",
+  "icon": "\ud83c\udfac",
+  "category": "multimedia",
+  "applications": [
+    {
+      "name": "gimp",
+      "display_name": "GIMP",
+      "args": [],
+      "env": {
+        "DISPLAY": ":99"
+      }
+    },
+    {
+      "name": "vlc",
+      "display_name": "VLC Media Player",
+      "args": [],
+      "env": {
+        "DISPLAY": ":99"
+      }
+    },
+    {
+      "name": "audacity",
+      "display_name": "Audacity",
+      "args": [],
+      "env": {
+        "DISPLAY": ":99"
+      }
+    }
+  ],
+  "layout": {
+    "type": "tiled",
+    "windows": [
+      {
+        "app": "gimp",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 1.0
+        }
+      },
+      {
+        "app": "vlc",
+        "position": {
+          "x": 0.5,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5
+        }
+      },
+      {
+        "app": "audacity",
+        "position": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5
+        }
+      }
+    ]
+  },
+  "settings": {
+    "auto_start": false,
+    "persistent": true,
+    "shared": false
+  }
+}

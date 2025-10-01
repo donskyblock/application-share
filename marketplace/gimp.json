@@ -1,0 +1,27 @@
+{
+  "id": "gimp",
+  "name": "GIMP",
+  "description": "Image manipulation program",
+  "version": "latest",
+  "category": "graphics",
+  "icon": "\ud83c\udfa8",
+  "author": "GIMP Team",
+  "license": "GPL",
+  "size": "150MB",
+  "dependencies": [],
+  "install_command": "apt-get install -y gimp",
+  "uninstall_command": "apt-get remove -y gimp",
+  "executable": "gimp",
+  "args": [],
+  "env": {
+    "DISPLAY": ":99"
+  },
+  "tags": [
+    "graphics",
+    "image",
+    "photo"
+  ],
+  "rating": 4.2,
+  "downloads": 600000,
+  "featured": false
+}

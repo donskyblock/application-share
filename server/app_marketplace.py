@@ -14,8 +14,8 @@ import requests
 
 class AppMarketplace:
     def __init__(self):
-        self.marketplace_dir = os.getenv("MARKETPLACE_DIR", "/app/marketplace")
-        self.apps_dir = os.getenv("APPS_DIR", "/app/apps")
+        self.marketplace_dir = os.getenv("MARKETPLACE_DIR", "marketplace")
+        self.apps_dir = os.getenv("APPS_DIR", "apps")
         self.installed_apps: Dict[str, Dict[str, Any]] = {}
         self.available_apps: Dict[str, Dict[str, Any]] = {}
         

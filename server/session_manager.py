@@ -4,6 +4,7 @@ Handles multi-user session management and collaboration
 """
 
 import asyncio
+import os
 import time
 import json
 from typing import Dict, List, Optional, Any, Set

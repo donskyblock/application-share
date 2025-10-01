@@ -10,8 +10,8 @@ from pathlib import Path
 
 class AppTemplateManager:
     def __init__(self):
-        self.templates_dir = os.getenv("TEMPLATES_DIR", "/app/templates")
-        self.presets_dir = os.getenv("PRESETS_DIR", "/app/presets")
+        self.templates_dir = os.getenv("TEMPLATES_DIR", "templates")
+        self.presets_dir = os.getenv("PRESETS_DIR", "presets")
         
         # Create directories
         os.makedirs(self.templates_dir, exist_ok=True)

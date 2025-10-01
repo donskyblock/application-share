@@ -1,0 +1,33 @@
+{
+  "id": "code",
+  "name": "Visual Studio Code",
+  "description": "Code editor for development",
+  "version": "latest",
+  "category": "development",
+  "icon": "\ud83d\udcbb",
+  "author": "Microsoft",
+  "license": "MIT",
+  "size": "200MB",
+  "dependencies": [
+    "curl",
+    "wget"
+  ],
+  "install_command": "curl -fsSL https://code-server.dev/install.sh | sh",
+  "uninstall_command": "apt-get remove -y code-server",
+  "executable": "code-server",
+  "args": [
+    "--bind-addr",
+    "0.0.0.0:8080"
+  ],
+  "env": {
+    "DISPLAY": ":99"
+  },
+  "tags": [
+    "editor",
+    "development",
+    "ide"
+  ],
+  "rating": 4.8,
+  "downloads": 500000,
+  "featured": true
+}

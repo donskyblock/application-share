@@ -16,7 +16,7 @@ import wave
 import pyaudio
 
 class SessionRecorder:
-    def __init__(self, session_id: str, recording_dir: str = "/app/recordings"):
+    def __init__(self, session_id: str, recording_dir: str = "recordings"):
         self.session_id = session_id
         self.recording_dir = recording_dir
         self.is_recording = False
@@ -159,7 +159,7 @@ class SessionRecorder:
 class RecordingManager:
     def __init__(self):
         self.active_recordings: Dict[str, SessionRecorder] = {}
-        self.recording_dir = os.getenv("RECORDING_DIR", "/app/recordings")
+        self.recording_dir = os.getenv("RECORDING_DIR", "recordings")
         self.max_recordings = int(os.getenv("MAX_RECORDINGS", "100"))
         
         # Create recording directory

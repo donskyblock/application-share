@@ -1,0 +1,27 @@
+{
+  "id": "firefox",
+  "name": "Mozilla Firefox",
+  "description": "Web browser for browsing the internet",
+  "version": "latest",
+  "category": "internet",
+  "icon": "\ud83c\udf10",
+  "author": "Mozilla",
+  "license": "MPL 2.0",
+  "size": "100MB",
+  "dependencies": [],
+  "install_command": "apt-get install -y firefox",
+  "uninstall_command": "apt-get remove -y firefox",
+  "executable": "firefox",
+  "args": [],
+  "env": {
+    "DISPLAY": ":99"
+  },
+  "tags": [
+    "browser",
+    "web",
+    "internet"
+  ],
+  "rating": 4.5,
+  "downloads": 1000000,
+  "featured": true
+}

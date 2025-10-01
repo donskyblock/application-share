@@ -1,0 +1,43 @@
+{
+  "name": "Gaming Setup",
+  "description": "Gaming environment with Steam and emulators",
+  "icon": "\ud83c\udfae",
+  "category": "gaming",
+  "applications": [
+    {
+      "name": "steam",
+      "display_name": "Steam",
+      "args": [],
+      "env": {
+        "DISPLAY": ":99"
+      }
+    },
+    {
+      "name": "lutris",
+      "display_name": "Lutris",
+      "args": [],
+      "env": {
+        "DISPLAY": ":99"
+      }
+    }
+  ],
+  "layout": {
+    "type": "fullscreen",
+    "windows": [
+      {
+        "app": "steam",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "width": 1.0,
+          "height": 1.0
+        }
+      }
+    ]
+  },
+  "settings": {
+    "auto_start": false,
+    "persistent": false,
+    "shared": false
+  }
+}

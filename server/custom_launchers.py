@@ -13,7 +13,7 @@ from pathlib import Path
 
 class CustomLauncherManager:
     def __init__(self):
-        self.launchers_dir = os.getenv("LAUNCHERS_DIR", "/app/launchers")
+        self.launchers_dir = os.getenv("LAUNCHERS_DIR", "launchers")
         self.custom_launchers: Dict[str, Dict[str, Any]] = {}
         
         # Create directory

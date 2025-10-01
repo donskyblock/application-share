@@ -1,0 +1,27 @@
+{
+  "id": "libreoffice",
+  "name": "LibreOffice",
+  "description": "Office productivity suite",
+  "version": "latest",
+  "category": "productivity",
+  "icon": "\ud83d\udcca",
+  "author": "The Document Foundation",
+  "license": "MPL 2.0",
+  "size": "300MB",
+  "dependencies": [],
+  "install_command": "apt-get install -y libreoffice",
+  "uninstall_command": "apt-get remove -y libreoffice",
+  "executable": "libreoffice",
+  "args": [],
+  "env": {
+    "DISPLAY": ":99"
+  },
+  "tags": [
+    "office",
+    "productivity",
+    "documents"
+  ],
+  "rating": 4.3,
+  "downloads": 800000,
+  "featured": true
+}

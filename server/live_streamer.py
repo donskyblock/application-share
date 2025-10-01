@@ -4,6 +4,7 @@ Provides real-time screen streaming and input forwarding
 """
 
 import asyncio
+import os
 import subprocess
 import base64
 import json
