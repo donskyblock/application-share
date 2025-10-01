@@ -1,10 +1,69 @@
 #!/bin/bash
 
-# Application Share Production Startup Script
+# Application Share Multi-Distribution Production Startup Script
 
 set -e
 
-echo "🚀 Starting Application Share in Production Mode..."
+echo "🚀 Starting Application Share in Multi-Distribution Production Mode..."
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_status() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+print_distro() {
+    echo -e "${PURPLE}[DISTRO]${NC} $1"
+}
+
+# Function to detect Linux distribution
+detect_distribution() {
+    print_status "Detecting Linux distribution..."
+    
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        DISTRO_ID=$ID
+        DISTRO_VERSION=$VERSION_ID
+        DISTRO_NAME=$NAME
+    elif [ -f /etc/arch-release ]; then
+        DISTRO_ID="arch"
+        DISTRO_VERSION="rolling"
+        DISTRO_NAME="Arch Linux"
+    elif [ -f /etc/debian_version ]; then
+        DISTRO_ID="debian"
+        DISTRO_VERSION=$(cat /etc/debian_version)
+        DISTRO_NAME="Debian"
+    else
+        DISTRO_ID="unknown"
+        DISTRO_VERSION="unknown"
+        DISTRO_NAME="Unknown"
+    fi
+    
+    print_distro "Detected: $DISTRO_NAME ($DISTRO_ID $DISTRO_VERSION)"
+}
+
+# Detect distribution first
+detect_distribution
 
 # Function to handle shutdown gracefully
 cleanup() {

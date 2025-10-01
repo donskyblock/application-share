@@ -1,17 +1,19 @@
 #!/bin/bash
 
-# Comprehensive Deployment Script for Application Share
-# Deploys all features including the new enhancements
+# Comprehensive Multi-Distribution Deployment Script for Application Share
+# Deploys all features including multi-distro support and enhancements
 
 set -e
 
-echo "🚀 Starting comprehensive deployment of Application Share..."
+echo "🚀 Starting comprehensive multi-distribution deployment of Application Share..."
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Function to print colored output
@@ -31,6 +33,47 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+print_distro() {
+    echo -e "${PURPLE}[DISTRO]${NC} $1"
+}
+
+print_feature() {
+    echo -e "${CYAN}[FEATURE]${NC} $1"
+}
+
+# Function to detect Linux distribution
+detect_distribution() {
+    print_status "Detecting Linux distribution..."
+    
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        DISTRO_ID=$ID
+        DISTRO_VERSION=$VERSION_ID
+        DISTRO_NAME=$NAME
+    elif [ -f /etc/arch-release ]; then
+        DISTRO_ID="arch"
+        DISTRO_VERSION="rolling"
+        DISTRO_NAME="Arch Linux"
+    elif [ -f /etc/debian_version ]; then
+        DISTRO_ID="debian"
+        DISTRO_VERSION=$(cat /etc/debian_version)
+        DISTRO_NAME="Debian"
+    elif [ -f /etc/redhat-release ]; then
+        DISTRO_ID="rhel"
+        DISTRO_VERSION=$(cat /etc/redhat-release | grep -oE '[0-9]+' | head -1)
+        DISTRO_NAME="Red Hat Enterprise Linux"
+    else
+        DISTRO_ID="unknown"
+        DISTRO_VERSION="unknown"
+        DISTRO_NAME="Unknown"
+    fi
+    
+    print_distro "Detected: $DISTRO_NAME ($DISTRO_ID $DISTRO_VERSION)"
+}
+
+# Detect distribution first
+detect_distribution
+
 # Check if running as root
 if [[ $EUID -eq 0 ]]; then
    print_error "This script should not be run as root for security reasons"
@@ -42,66 +85,239 @@ print_status "Creating application directories..."
 mkdir -p /home/$USER/application-share/{data,logs,temp,recordings,marketplace,launchers,templates,presets}
 mkdir -p /home/$USER/application-share/client/build
 mkdir -p /home/$USER/application-share/k8s
+mkdir -p /home/$USER/application-share/nginx/ssl
 
 # Set permissions
 chmod 755 /home/$USER/application-share
 chmod 755 /home/$USER/application-share/{data,logs,temp,recordings,marketplace,launchers,templates,presets}
 
-# Install system dependencies
-print_status "Installing system dependencies..."
-sudo apt-get update
-sudo apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    nodejs \
-    npm \
-    git \
-    curl \
-    wget \
-    unzip \
-    x11-utils \
-    xdotool \
-    imagemagick \
-    xvfb \
-    x11vnc \
-    xrdp \
-    fluxbox \
-    procps \
-    netcat-openbsd \
-    pulseaudio \
-    pulseaudio-utils \
-    alsa-utils \
-    ffmpeg \
-    vlc \
-    firefox \
-    libreoffice \
-    gimp \
-    code \
-    steam \
-    lutris \
-    audacity \
-    gparted \
-    filezilla \
-    thunderbird \
-    gedit \
-    gnome-terminal \
-    htop \
-    neofetch \
-    tree \
-    jq \
-    rsync \
-    ssh \
-    openssh-server \
-    ufw \
-    fail2ban \
-    logrotate \
-    cron \
-    systemd \
-    docker.io \
-    docker-compose \
-    kubectl \
-    helm
+# Install system dependencies based on distribution
+print_status "Installing system dependencies for $DISTRO_NAME..."
+
+case $DISTRO_ID in
+    "arch"|"archlinux")
+        print_feature "Installing Arch Linux dependencies..."
+        sudo pacman -Syu --noconfirm
+        sudo pacman -S --noconfirm \
+            python \
+            python-pip \
+            python-virtualenv \
+            nodejs \
+            npm \
+            git \
+            curl \
+            wget \
+            unzip \
+            xorg-server \
+            xorg-xinit \
+            xorg-xrandr \
+            xorg-xdpyinfo \
+            xdotool \
+            imagemagick \
+            xvfb \
+            x11vnc \
+            xrdp \
+            fluxbox \
+            procps-ng \
+            netcat \
+            pulseaudio \
+            pulseaudio-alsa \
+            alsa-utils \
+            ffmpeg \
+            vlc \
+            firefox \
+            libreoffice-fresh \
+            gimp \
+            code \
+            steam \
+            lutris \
+            audacity \
+            gparted \
+            filezilla \
+            thunderbird \
+            geany \
+            nano \
+            htop \
+            neofetch \
+            tree \
+            jq \
+            rsync \
+            openssh \
+            ufw \
+            fail2ban \
+            logrotate \
+            cronie \
+            systemd \
+            docker \
+            docker-compose \
+            kubectl \
+            helm
+        ;;
+    "debian"|"ubuntu")
+        print_feature "Installing Debian/Ubuntu dependencies..."
+        sudo apt-get update
+        sudo apt-get install -y \
+            python3 \
+            python3-pip \
+            python3-venv \
+            nodejs \
+            npm \
+            git \
+            curl \
+            wget \
+            unzip \
+            x11-utils \
+            xdotool \
+            imagemagick \
+            xvfb \
+            x11vnc \
+            xrdp \
+            fluxbox \
+            procps \
+            netcat-openbsd \
+            pulseaudio \
+            pulseaudio-utils \
+            alsa-utils \
+            ffmpeg \
+            vlc \
+            firefox \
+            libreoffice \
+            gimp \
+            code \
+            steam \
+            lutris \
+            audacity \
+            gparted \
+            filezilla \
+            thunderbird \
+            gedit \
+            gnome-terminal \
+            htop \
+            neofetch \
+            tree \
+            jq \
+            rsync \
+            ssh \
+            openssh-server \
+            ufw \
+            fail2ban \
+            logrotate \
+            cron \
+            systemd \
+            docker.io \
+            docker-compose \
+            kubectl \
+            helm
+        ;;
+    "alpine")
+        print_feature "Installing Alpine Linux dependencies..."
+        sudo apk add --no-cache \
+            python3 \
+            py3-pip \
+            python3-dev \
+            build-base \
+            linux-headers \
+            nodejs \
+            npm \
+            git \
+            curl \
+            wget \
+            unzip \
+            xvfb \
+            x11vnc \
+            xrdp \
+            fluxbox \
+            procps \
+            netcat-openbsd \
+            pulseaudio \
+            alsa-utils \
+            ffmpeg \
+            vlc \
+            firefox \
+            libreoffice \
+            gimp \
+            code \
+            steam \
+            lutris \
+            audacity \
+            gparted \
+            filezilla \
+            thunderbird \
+            geany \
+            nano \
+            htop \
+            neofetch \
+            tree \
+            jq \
+            rsync \
+            openssh \
+            ufw \
+            fail2ban \
+            logrotate \
+            dcron \
+            openrc \
+            docker \
+            docker-compose \
+            kubectl \
+            helm
+        ;;
+    *)
+        print_warning "Unknown distribution, using Debian/Ubuntu package list as fallback..."
+        sudo apt-get update
+        sudo apt-get install -y \
+            python3 \
+            python3-pip \
+            python3-venv \
+            nodejs \
+            npm \
+            git \
+            curl \
+            wget \
+            unzip \
+            x11-utils \
+            xdotool \
+            imagemagick \
+            xvfb \
+            x11vnc \
+            xrdp \
+            fluxbox \
+            procps \
+            netcat-openbsd \
+            pulseaudio \
+            pulseaudio-utils \
+            alsa-utils \
+            ffmpeg \
+            vlc \
+            firefox \
+            libreoffice \
+            gimp \
+            code \
+            steam \
+            lutris \
+            audacity \
+            gparted \
+            filezilla \
+            thunderbird \
+            gedit \
+            gnome-terminal \
+            htop \
+            neofetch \
+            tree \
+            jq \
+            rsync \
+            ssh \
+            openssh-server \
+            ufw \
+            fail2ban \
+            logrotate \
+            cron \
+            systemd \
+            docker.io \
+            docker-compose \
+            kubectl \
+            helm
+        ;;
+esac
 
 # Install Python dependencies
 print_status "Installing Python dependencies..."
@@ -159,12 +375,196 @@ sleep 2
 print_status "Setting up PulseAudio..."
 pulseaudio --start --exit-idle-time=-1
 
-# Create Docker image
-print_status "Building Docker image..."
-docker build -t application-share:latest .
+# Create multi-distro Docker images
+print_status "Building multi-distribution Docker images..."
 
-# Create Docker Compose override for production
-print_status "Creating production Docker Compose configuration..."
+# Build all distribution images
+for distro in arch debian ubuntu alpine; do
+    if [ -f "Dockerfile.${distro}" ]; then
+        print_feature "Building ${distro} Docker image..."
+        docker build -f "Dockerfile.${distro}" -t "application-share-${distro}:latest" .
+        print_success "Built ${distro} image successfully"
+    else
+        print_warning "Dockerfile.${distro} not found, skipping ${distro} build"
+    fi
+done
+
+# Also build the basic image for compatibility
+print_status "Building basic Docker image..."
+docker build -f Dockerfile.basic -t application-share:latest .
+
+# Create multi-distro Docker Compose configuration
+print_status "Creating multi-distribution Docker Compose configuration..."
+cat > docker-compose.multi-prod.yml <<EOF
+version: '3.8'
+
+services:
+  # Arch Linux container
+  application-share-arch:
+    image: application-share-arch:latest
+    container_name: application-share-arch
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "5900:5900"
+      - "3389:3389"
+    environment:
+      - NODE_ENV=production
+      - DISPLAY=:99
+      - ENABLE_VNC=true
+      - ENABLE_RDP=true
+      - ENABLE_AUDIO=true
+      - ENABLE_WEBRTC=true
+      - ENABLE_RECORDING=true
+      - ENABLE_MARKETPLACE=true
+      - ENABLE_CUSTOM_LAUNCHERS=true
+      - DISTRO=arch
+    volumes:
+      - ./data/arch:/app/data
+      - ./logs/arch:/app/logs
+      - ./recordings/arch:/app/recordings
+      - ./marketplace/arch:/app/marketplace
+      - ./launchers/arch:/app/launchers
+      - ./templates/arch:/app/templates
+      - ./presets/arch:/app/presets
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    devices:
+      - /dev/snd:/dev/snd
+    privileged: true
+    networks:
+      - app-network
+
+  # Debian container
+  application-share-debian:
+    image: application-share-debian:latest
+    container_name: application-share-debian
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+      - "5901:5900"
+      - "3390:3389"
+    environment:
+      - NODE_ENV=production
+      - DISPLAY=:99
+      - ENABLE_VNC=true
+      - ENABLE_RDP=true
+      - ENABLE_AUDIO=true
+      - ENABLE_WEBRTC=true
+      - ENABLE_RECORDING=true
+      - ENABLE_MARKETPLACE=true
+      - ENABLE_CUSTOM_LAUNCHERS=true
+      - DISTRO=debian
+    volumes:
+      - ./data/debian:/app/data
+      - ./logs/debian:/app/logs
+      - ./recordings/debian:/app/recordings
+      - ./marketplace/debian:/app/marketplace
+      - ./launchers/debian:/app/launchers
+      - ./templates/debian:/app/templates
+      - ./presets/debian:/app/presets
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    devices:
+      - /dev/snd:/dev/snd
+    privileged: true
+    networks:
+      - app-network
+
+  # Ubuntu container
+  application-share-ubuntu:
+    image: application-share-ubuntu:latest
+    container_name: application-share-ubuntu
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+      - "5902:5900"
+      - "3391:3389"
+    environment:
+      - NODE_ENV=production
+      - DISPLAY=:99
+      - ENABLE_VNC=true
+      - ENABLE_RDP=true
+      - ENABLE_AUDIO=true
+      - ENABLE_WEBRTC=true
+      - ENABLE_RECORDING=true
+      - ENABLE_MARKETPLACE=true
+      - ENABLE_CUSTOM_LAUNCHERS=true
+      - DISTRO=ubuntu
+    volumes:
+      - ./data/ubuntu:/app/data
+      - ./logs/ubuntu:/app/logs
+      - ./recordings/ubuntu:/app/recordings
+      - ./marketplace/ubuntu:/app/marketplace
+      - ./launchers/ubuntu:/app/launchers
+      - ./templates/ubuntu:/app/templates
+      - ./presets/ubuntu:/app/presets
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    devices:
+      - /dev/snd:/dev/snd
+    privileged: true
+    networks:
+      - app-network
+
+  # Alpine container
+  application-share-alpine:
+    image: application-share-alpine:latest
+    container_name: application-share-alpine
+    restart: unless-stopped
+    ports:
+      - "3003:3000"
+      - "5903:5900"
+      - "3392:3389"
+    environment:
+      - NODE_ENV=production
+      - DISPLAY=:99
+      - ENABLE_VNC=true
+      - ENABLE_RDP=true
+      - ENABLE_AUDIO=true
+      - ENABLE_WEBRTC=true
+      - ENABLE_RECORDING=true
+      - ENABLE_MARKETPLACE=true
+      - ENABLE_CUSTOM_LAUNCHERS=true
+      - DISTRO=alpine
+    volumes:
+      - ./data/alpine:/app/data
+      - ./logs/alpine:/app/logs
+      - ./recordings/alpine:/app/recordings
+      - ./marketplace/alpine:/app/marketplace
+      - ./launchers/alpine:/app/launchers
+      - ./templates/alpine:/app/templates
+      - ./presets/alpine:/app/presets
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    devices:
+      - /dev/snd:/dev/snd
+    privileged: true
+    networks:
+      - app-network
+
+  # Nginx load balancer
+  nginx:
+    image: nginx:alpine
+    container_name: application-share-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - application-share-arch
+      - application-share-debian
+      - application-share-ubuntu
+      - application-share-alpine
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+EOF
+
+# Create single-distro Docker Compose for compatibility
+print_status "Creating single-distribution Docker Compose configuration..."
 cat > docker-compose.prod.yml <<EOF
 version: '3.8'
 
@@ -696,7 +1096,7 @@ EOF
 
 chmod +x ~/Desktop/Application-Share.desktop
 
-print_success "🎉 Comprehensive deployment complete!"
+print_success "🎉 Comprehensive multi-distribution deployment complete!"
 echo ""
 echo "📋 Next Steps:"
 echo "1. Edit .env file with your configuration"
@@ -714,8 +1114,26 @@ echo "  ./restore.sh       - Restore from backup"
 echo "  ./uninstall.sh     - Uninstall everything"
 echo ""
 echo "🐳 Docker Commands:"
+echo "  # Single distribution:"
 echo "  docker-compose -f docker-compose.prod.yml up -d"
 echo "  docker-compose -f docker-compose.prod.yml down"
+echo ""
+echo "  # Multi-distribution:"
+echo "  docker-compose -f docker-compose.multi-prod.yml up -d"
+echo "  docker-compose -f docker-compose.multi-prod.yml down"
+echo ""
+echo "  # Multi-distro management:"
+echo "  ./build-multi-distro.sh build all"
+echo "  ./build-multi-distro.sh run-all"
+echo "  ./build-multi-distro.sh status"
+echo "  ./deploy-multi-distro.sh all"
+echo ""
+echo "🌐 Multi-Distribution Access:"
+echo "  Load Balancer:     http://localhost (all distributions)"
+echo "  Arch Linux:        http://localhost:3000"
+echo "  Debian:            http://localhost:3001"
+echo "  Ubuntu:            http://localhost:3002"
+echo "  Alpine:            http://localhost:3003"
 echo ""
 echo "☸️  Kubernetes Commands:"
 echo "  ./k8s/deploy.sh    - Deploy to Kubernetes"
@@ -724,6 +1142,7 @@ echo ""
 echo "📚 Documentation:"
 echo "  README.md          - Main documentation"
 echo "  FEATURES.md        - Complete feature list"
+echo "  MULTI_DISTRO.md    - Multi-distribution guide"
 echo "  k8s/               - Kubernetes configurations"
 echo ""
-print_success "Application Share is ready to use! 🚀"
+print_success "Application Share with multi-distribution support is ready to use! 🚀"
