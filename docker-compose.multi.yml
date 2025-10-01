@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # Arch Linux container
+  application-share-arch:
+    build:
+      context: .
+      dockerfile: Dockerfile.arch
+    container_name: application-share-arch
+    ports:
+      - "3001:3000"
+      - "5901:5900"
+      - "3389:3389"
+    environment:
+      - ADMIN_PASSWORD=yourpassword123
+    volumes:
+      - ./data/arch:/app/data
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Debian container
+  application-share-debian:
+    build:
+      context: .
+      dockerfile: Dockerfile.debian
+    container_name: application-share-debian
+    ports:
+      - "3002:3000"
+      - "5902:5900"
+      - "3390:3389"
+    environment:
+      - ADMIN_PASSWORD=yourpassword123
+    volumes:
+      - ./data/debian:/app/data
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Ubuntu container
+  application-share-ubuntu:
+    build:
+      context: .
+      dockerfile: Dockerfile.ubuntu
+    container_name: application-share-ubuntu
+    ports:
+      - "3003:3000"
+      - "5903:5900"
+      - "3391:3389"
+    environment:
+      - ADMIN_PASSWORD=yourpassword123
+    volumes:
+      - ./data/ubuntu:/app/data
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Alpine Linux container
+  application-share-alpine:
+    build:
+      context: .
+      dockerfile: Dockerfile.alpine
+    container_name: application-share-alpine
+    ports:
+      - "3004:3000"
+      - "5904:5900"
+      - "3392:3389"
+    environment:
+      - ADMIN_PASSWORD=yourpassword123
+    volumes:
+      - ./data/alpine:/app/data
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Nginx reverse proxy for load balancing
+  nginx:
+    image: nginx:alpine
+    container_name: application-share-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - application-share-arch
+      - application-share-debian
+      - application-share-ubuntu
+      - application-share-alpine
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  arch-data:
+  debian-data:
+  ubuntu-data:
+  alpine-data:

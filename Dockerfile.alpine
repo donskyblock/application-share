@@ -1,0 +1,95 @@
+# Alpine Linux based Dockerfile for Application Share
+FROM alpine:latest
+
+# Install dependencies
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    python3-dev \
+    build-base \
+    linux-headers \
+    xvfb \
+    x11vnc \
+    fluxbox \
+    firefox \
+    chromium \
+    libreoffice \
+    gimp \
+    vlc \
+    filezilla \
+    thunderbird \
+    geany \
+    nano \
+    htop \
+    curl \
+    wget \
+    git \
+    sudo \
+    dbus \
+    ttf-dejavu \
+    ttf-liberation \
+    font-noto \
+    mesa-dri-gallium \
+    mesa-gl \
+    x11-utils \
+    xauth \
+    xinit
+
+# Create app user
+RUN adduser -D -s /bin/bash appuser && \
+    echo "appuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Set working directory
+WORKDIR /app
+
+# Install Python packages
+RUN pip3 install --upgrade pip && \
+    pip3 install fastapi uvicorn python-socketio python-multipart python-dotenv passlib python-jose websockets pillow opencv-python-headless numpy psutil pydantic httpx aiofiles jinja2
+
+# Copy application code
+COPY . .
+
+# Create a simple static frontend
+RUN mkdir -p /app/static && \
+    echo '<!DOCTYPE html><html><head><title>Application Share</title><meta charset="utf-8"></head><body><h1>Application Share</h1><p>Remote desktop access is ready!</p></body></html>' > /app/static/index.html
+
+# Create startup script
+RUN echo '#!/bin/bash\n\
+echo "🚀 Starting Application Share on Alpine Linux..."\n\
+echo "🖥️  Starting virtual display..."\n\
+Xvfb :99 -screen 0 1920x1080x24 -ac +extension GLX +render -noreset &\n\
+sleep 2\n\
+echo "🪟 Starting window manager..."\n\
+DISPLAY=:99 fluxbox &\n\
+sleep 2\n\
+echo "⏳ Waiting for display to be ready..."\n\
+while ! xdpyinfo -display :99 >/dev/null 2>&1; do\n\
+    sleep 1\n\
+done\n\
+echo "✅ Display is ready"\n\
+echo "📝 Creating .env file..."\n\
+cat > /app/.env << EOF\n\
+PORT=3000\n\
+DISPLAY=:99\n\
+ADMIN_USERNAME=admin\n\
+ADMIN_PASSWORD=${ADMIN_PASSWORD:-yourpassword123}\n\
+VNC_ENABLED=false\n\
+EOF\n\
+echo "🔧 Configuration:"\n\
+echo "   Port: 3000"\n\
+echo "   Display: :99"\n\
+echo "   Admin Username: admin"\n\
+echo "   Admin Password: ${ADMIN_PASSWORD:-yourpassword123}"\n\
+echo "   VNC Enabled: false"\n\
+echo "🐍 Starting Application Share server..."\n\
+cd /app && python3 main.py\n\
+' > /start.sh && chmod +x /start.sh
+
+# Switch to app user
+USER appuser
+
+# Expose ports
+EXPOSE 3000 5900 3389
+
+# Start the application
+CMD ["/start.sh"]
