@@ -33,6 +33,15 @@ RUN pacman -Syu --noconfirm && \
     noto-fonts \
     && pacman -Scc --noconfirm
 
+# Install audio system (avoid PulseAudio/PipeWire conflicts)
+RUN if pacman -Q pipewire &>/dev/null; then \
+        echo "PipeWire already installed, installing additional audio packages..."; \
+        pacman -S --noconfirm pipewire-pulse pipewire-alsa pipewire-jack; \
+    else \
+        echo "Installing PipeWire audio system..."; \
+        pacman -S --noconfirm pipewire pipewire-pulse pipewire-alsa pipewire-jack; \
+    fi
+
 # Install optional packages with fallbacks
 RUN if pacman -Si xorg-server-xvfb &>/dev/null; then \
         pacman -S --noconfirm xorg-server-xvfb; \

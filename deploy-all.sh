@@ -120,8 +120,6 @@ case $DISTRO_ID in
             fluxbox \
             procps-ng \
             netcat \
-            pulseaudio \
-            pulseaudio-alsa \
             alsa-utils \
             ffmpeg \
             vlc \
@@ -151,6 +149,23 @@ case $DISTRO_ID in
             docker-compose \
             kubectl \
             helm
+        
+        # Audio system conflict resolution
+        print_status "Resolving audio system conflicts..."
+        
+        # Check if PipeWire is already installed
+        if pacman -Q pipewire &>/dev/null; then
+            print_warning "PipeWire detected, skipping PulseAudio to avoid conflicts"
+            print_status "Installing PipeWire audio packages..."
+            sudo pacman -S --noconfirm pipewire pipewire-pulse pipewire-alsa pipewire-jack
+        else
+            print_status "Installing PulseAudio audio packages..."
+            # Try to install PulseAudio, but handle conflicts gracefully
+            if ! sudo pacman -S --noconfirm pulseaudio pulseaudio-alsa 2>/dev/null; then
+                print_warning "PulseAudio installation failed, trying PipeWire instead..."
+                sudo pacman -S --noconfirm pipewire pipewire-pulse pipewire-alsa pipewire-jack
+            fi
+        fi
         
         # Optional packages with fallbacks
         print_status "Installing optional packages with fallbacks..."

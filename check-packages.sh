@@ -153,6 +153,43 @@ check_critical_packages() {
     return 0
 }
 
+# Function to check audio system conflicts
+check_audio_conflicts() {
+    local distro=$1
+    
+    if [ "$distro" = "arch" ] || [ "$distro" = "archlinux" ]; then
+        print_status "Checking for audio system conflicts..."
+        
+        local conflicts=()
+        
+        # Check if both PulseAudio and PipeWire are installed
+        if pacman -Q pulseaudio &>/dev/null && pacman -Q pipewire &>/dev/null; then
+            conflicts+=("PulseAudio and PipeWire both installed")
+        fi
+        
+        # Check for conflicting packages
+        if pacman -Q pulseaudio-alsa &>/dev/null && pacman -Q pipewire-alsa &>/dev/null; then
+            conflicts+=("PulseAudio-ALSA and PipeWire-ALSA both installed")
+        fi
+        
+        if [ ${#conflicts[@]} -gt 0 ]; then
+            print_error "Audio conflicts detected:"
+            for conflict in "${conflicts[@]}"; do
+                echo "  - $conflict"
+            done
+            echo ""
+            print_status "Resolution commands:"
+            echo "  ./fix-audio-conflicts.sh --pipewire    # Switch to PipeWire (recommended)"
+            echo "  ./fix-audio-conflicts.sh --pulseaudio  # Switch to PulseAudio"
+            echo "  ./fix-audio-conflicts.sh --auto        # Auto-resolve conflicts"
+            return 1
+        else
+            print_success "No audio conflicts detected"
+            return 0
+        fi
+    fi
+}
+
 # Function to check optional packages
 check_optional_packages() {
     local distro=$1
@@ -423,6 +460,9 @@ main() {
         print_error "Critical packages are missing. Please install them first."
         exit 1
     fi
+    
+    # Check audio conflicts (Arch Linux only)
+    check_audio_conflicts "$DISTRO_ID"
     
     # Check optional packages
     check_optional_packages "$DISTRO_ID"
