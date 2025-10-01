@@ -427,7 +427,15 @@ cd /home/$USER/application-share
 python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
-pip install -r requirements.txt
+
+# Install from requirements.txt if it exists, otherwise install core packages
+if [ -f "requirements.txt" ]; then
+    print_status "Installing from requirements.txt..."
+    pip install -r requirements.txt
+else
+    print_warning "requirements.txt not found, installing core packages manually..."
+    pip install fastapi uvicorn python-socketio python-multipart python-dotenv passlib python-jose websockets pillow opencv-python-headless numpy psutil pydantic httpx aiofiles jinja2
+fi
 
 # Install Node.js dependencies
 print_status "Installing Node.js dependencies..."

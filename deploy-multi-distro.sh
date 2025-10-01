@@ -278,6 +278,32 @@ build_image() {
         return 1
     fi
     
+    # Ensure requirements.txt exists
+    if [ ! -f "requirements.txt" ]; then
+        print_warning "requirements.txt not found, creating basic one..."
+        cat > requirements.txt <<EOF
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-socketio>=5.10.0
+python-multipart>=0.0.6
+python-dotenv>=1.0.0
+passlib[bcrypt]>=1.7.4
+python-jose[cryptography]>=3.3.0
+websockets>=12.0
+opencv-python-headless>=4.8.0
+Pillow>=10.0.0
+numpy>=1.24.0
+pyaudio>=0.2.11
+psutil>=5.9.0
+aiofiles>=23.2.0
+requests>=2.31.0
+httpx>=0.25.0
+aiortc>=1.6.0
+pydantic>=2.5.0
+Jinja2>=3.1.0
+EOF
+    fi
+    
     # Build the image
     if docker build -f "$dockerfile" -t "$image_tag" .; then
         print_success "Successfully built ${distro} image: $image_tag"
