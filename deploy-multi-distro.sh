@@ -14,6 +14,9 @@ PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+# Get the actual project directory
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Configuration
 REGISTRY="ghcr.io/donskyblock"
 IMAGE_NAME="application-share"
@@ -253,14 +256,14 @@ install_dependencies() {
 create_directories() {
     print_status "Creating application directories..."
     
-    mkdir -p /home/$USER/application-share/{data,logs,temp,recordings,marketplace,launchers,templates,presets}
-    mkdir -p /home/$USER/application-share/client/build
-    mkdir -p /home/$USER/application-share/k8s
-    mkdir -p /home/$USER/application-share/nginx/ssl
+    mkdir -p $PROJECT_DIR/{data,logs,temp,recordings,marketplace,launchers,templates,presets}
+    mkdir -p $PROJECT_DIR/client/build
+    mkdir -p $PROJECT_DIR/k8s
+    mkdir -p $PROJECT_DIR/nginx/ssl
     
     # Set permissions
-    chmod 755 /home/$USER/application-share
-    chmod 755 /home/$USER/application-share/{data,logs,temp,recordings,marketplace,launchers,templates,presets}
+    chmod 755 $PROJECT_DIR
+    chmod 755 $PROJECT_DIR/{data,logs,temp,recordings,marketplace,launchers,templates,presets}
     
     print_success "Directories created"
 }

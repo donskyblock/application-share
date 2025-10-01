@@ -80,16 +80,19 @@ if [[ $EUID -eq 0 ]]; then
    exit 1
 fi
 
+# Get the actual project directory
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Create necessary directories
 print_status "Creating application directories..."
-mkdir -p /home/$USER/application-share/{data,logs,temp,recordings,marketplace,launchers,templates,presets}
-mkdir -p /home/$USER/application-share/client/build
-mkdir -p /home/$USER/application-share/k8s
-mkdir -p /home/$USER/application-share/nginx/ssl
+mkdir -p $PROJECT_DIR/{data,logs,temp,recordings,marketplace,launchers,templates,presets}
+mkdir -p $PROJECT_DIR/client/build
+mkdir -p $PROJECT_DIR/k8s
+mkdir -p $PROJECT_DIR/nginx/ssl
 
 # Set permissions
-chmod 755 /home/$USER/application-share
-chmod 755 /home/$USER/application-share/{data,logs,temp,recordings,marketplace,launchers,templates,presets}
+chmod 755 $PROJECT_DIR
+chmod 755 $PROJECT_DIR/{data,logs,temp,recordings,marketplace,launchers,templates,presets}
 
 # Install system dependencies based on distribution
 print_status "Installing system dependencies for $DISTRO_NAME..."
@@ -423,7 +426,7 @@ esac
 
 # Install Python dependencies
 print_status "Installing Python dependencies..."
-cd /home/$USER/application-share
+cd $PROJECT_DIR
 python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
@@ -454,9 +457,9 @@ After=network.target
 [Service]
 Type=simple
 User=$USER
-WorkingDirectory=/home/$USER/application-share
-Environment=PATH=/home/$USER/application-share/venv/bin
-ExecStart=/home/$USER/application-share/venv/bin/python main.py
+WorkingDirectory=$PROJECT_DIR
+Environment=PATH=$PROJECT_DIR/venv/bin
+ExecStart=$PROJECT_DIR/venv/bin/python main.py
 Restart=always
 RestartSec=10
 
@@ -800,7 +803,7 @@ XRDP_PID=\$!
 
 # Start main application
 echo "Starting Application Share..."
-cd /home/$USER/application-share
+cd $PROJECT_DIR
 source venv/bin/activate
 python main.py &
 APP_PID=\$!
@@ -888,14 +891,14 @@ cat > backup.sh <<EOF
 #!/bin/bash
 
 # Backup script for Application Share
-BACKUP_DIR="/home/$USER/application-share-backups"
+BACKUP_DIR="$PROJECT_DIR-backups"
 TIMESTAMP=\$(date +%Y%m%d_%H%M%S)
 BACKUP_NAME="application-share-backup-\$TIMESTAMP"
 
 echo "📦 Creating backup: \$BACKUP_NAME"
 
 mkdir -p \$BACKUP_DIR
-cd /home/$USER/application-share
+cd $PROJECT_DIR
 
 # Create backup
 tar -czf "\$BACKUP_DIR/\$BACKUP_NAME.tar.gz" \\
@@ -916,7 +919,7 @@ cat > restore.sh <<EOF
 #!/bin/bash
 
 # Restore script for Application Share
-BACKUP_DIR="/home/$USER/application-share-backups"
+BACKUP_DIR="$PROJECT_DIR-backups"
 
 if [ \$# -eq 0 ]; then
     echo "Available backups:"
@@ -1037,7 +1040,7 @@ docker rmi application-share:latest 2>/dev/null || true
 read -p "Remove application directory? (y/N): " -n 1 -r
 echo
 if [[ \$REPLY =~ ^[Yy]$ ]]; then
-    rm -rf /home/$USER/application-share
+    rm -rf $PROJECT_DIR
     echo "✅ Application directory removed"
 fi
 
@@ -1198,7 +1201,7 @@ Version=1.0
 Type=Application
 Name=Application Share
 Comment=Start Application Share
-Exec=/home/$USER/application-share/start-all.sh
+Exec=$PROJECT_DIR/start-all.sh
 Icon=applications-internet
 Terminal=true
 Categories=Network;
