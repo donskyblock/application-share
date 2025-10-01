@@ -8,7 +8,6 @@ RUN apk add --no-cache \
     python3-dev \
     build-base \
     linux-headers \
-    xvfb \
     x11vnc \
     fluxbox \
     firefox \
@@ -34,6 +33,31 @@ RUN apk add --no-cache \
     x11-utils \
     xauth \
     xinit
+
+# Install optional packages with fallbacks
+RUN if apk search -q xvfb &>/dev/null; then \
+        apk add --no-cache xvfb; \
+    elif apk search -q xvfb-run &>/dev/null; then \
+        apk add --no-cache xvfb-run; \
+    else \
+        echo "xvfb not available, will use xvfb-run from x11-utils"; \
+    fi
+
+RUN if apk search -q xrdp &>/dev/null; then \
+        apk add --no-cache xrdp; \
+    elif apk search -q freerdp &>/dev/null; then \
+        apk add --no-cache freerdp; \
+    else \
+        echo "xrdp not available, RDP functionality will be limited"; \
+    fi
+
+RUN if apk search -q neofetch &>/dev/null; then \
+        apk add --no-cache neofetch; \
+    elif apk search -q fastfetch &>/dev/null; then \
+        apk add --no-cache fastfetch; \
+    else \
+        echo "neofetch not available, using basic system info"; \
+    fi
 
 # Create app user
 RUN adduser -D -s /bin/bash appuser && \

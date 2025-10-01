@@ -9,7 +9,6 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     python3-venv \
-    xvfb \
     x11vnc \
     fluxbox \
     firefox \
@@ -36,6 +35,31 @@ RUN apt-get update && apt-get install -y \
     xinit \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Install optional packages with fallbacks
+RUN if apt-cache show xvfb &>/dev/null; then \
+        apt-get install -y xvfb; \
+    elif apt-cache show xvfb-run &>/dev/null; then \
+        apt-get install -y xvfb-run; \
+    else \
+        echo "xvfb not available, will use xvfb-run from x11-utils"; \
+    fi
+
+RUN if apt-cache show xrdp &>/dev/null; then \
+        apt-get install -y xrdp; \
+    elif apt-cache show freerdp2-x11 &>/dev/null; then \
+        apt-get install -y freerdp2-x11; \
+    else \
+        echo "xrdp not available, RDP functionality will be limited"; \
+    fi
+
+RUN if apt-cache show neofetch &>/dev/null; then \
+        apt-get install -y neofetch; \
+    elif apt-cache show fastfetch &>/dev/null; then \
+        apt-get install -y fastfetch; \
+    else \
+        echo "neofetch not available, using basic system info"; \
+    fi
 
 # Create app user
 RUN useradd -m -s /bin/bash appuser && \

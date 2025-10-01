@@ -173,6 +173,8 @@ install_dependencies() {
         "arch"|"archlinux")
             print_feature "Installing Arch Linux dependencies..."
             sudo pacman -Syu --noconfirm
+            
+            # Core packages
             sudo pacman -S --noconfirm \
                 docker \
                 docker-compose \
@@ -180,12 +182,22 @@ install_dependencies() {
                 curl \
                 wget \
                 jq \
-                htop \
-                neofetch
+                htop
+            
+            # Optional packages with fallbacks
+            if pacman -Si neofetch &>/dev/null; then
+                sudo pacman -S --noconfirm neofetch
+            elif pacman -Si fastfetch &>/dev/null; then
+                sudo pacman -S --noconfirm fastfetch
+            else
+                print_warning "neofetch not available, using basic system info"
+            fi
             ;;
         "debian"|"ubuntu")
             print_feature "Installing Debian/Ubuntu dependencies..."
             sudo apt-get update
+            
+            # Core packages
             sudo apt-get install -y \
                 docker.io \
                 docker-compose \
@@ -194,13 +206,23 @@ install_dependencies() {
                 wget \
                 jq \
                 htop \
-                neofetch \
                 ca-certificates \
                 gnupg \
                 lsb-release
+            
+            # Optional packages with fallbacks
+            if apt-cache show neofetch &>/dev/null; then
+                sudo apt-get install -y neofetch
+            elif apt-cache show fastfetch &>/dev/null; then
+                sudo apt-get install -y fastfetch
+            else
+                print_warning "neofetch not available, using basic system info"
+            fi
             ;;
         "alpine")
             print_feature "Installing Alpine Linux dependencies..."
+            
+            # Core packages
             sudo apk add --no-cache \
                 docker \
                 docker-compose \
@@ -208,8 +230,16 @@ install_dependencies() {
                 curl \
                 wget \
                 jq \
-                htop \
-                neofetch
+                htop
+            
+            # Optional packages with fallbacks
+            if apk search -q neofetch &>/dev/null; then
+                sudo apk add --no-cache neofetch
+            elif apk search -q fastfetch &>/dev/null; then
+                sudo apk add --no-cache fastfetch
+            else
+                print_warning "neofetch not available, using basic system info"
+            fi
             ;;
         *)
             print_warning "Unknown distribution, skipping dependency installation"

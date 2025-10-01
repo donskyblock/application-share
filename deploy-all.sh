@@ -98,6 +98,8 @@ case $DISTRO_ID in
     "arch"|"archlinux")
         print_feature "Installing Arch Linux dependencies..."
         sudo pacman -Syu --noconfirm
+        
+        # Core packages (required)
         sudo pacman -S --noconfirm \
             python \
             python-pip \
@@ -114,9 +116,7 @@ case $DISTRO_ID in
             xorg-xdpyinfo \
             xdotool \
             imagemagick \
-            xvfb \
             x11vnc \
-            xrdp \
             fluxbox \
             procps-ng \
             netcat \
@@ -138,7 +138,6 @@ case $DISTRO_ID in
             geany \
             nano \
             htop \
-            neofetch \
             tree \
             jq \
             rsync \
@@ -152,10 +151,42 @@ case $DISTRO_ID in
             docker-compose \
             kubectl \
             helm
+        
+        # Optional packages with fallbacks
+        print_status "Installing optional packages with fallbacks..."
+        
+        # xvfb - try xorg-server-xvfb first, then xvfb-run
+        if pacman -Si xorg-server-xvfb &>/dev/null; then
+            sudo pacman -S --noconfirm xorg-server-xvfb
+        elif pacman -Si xvfb &>/dev/null; then
+            sudo pacman -S --noconfirm xvfb
+        else
+            print_warning "xvfb not available, will use xvfb-run from xorg-server"
+        fi
+        
+        # xrdp - try different package names
+        if pacman -Si xrdp &>/dev/null; then
+            sudo pacman -S --noconfirm xrdp
+        elif pacman -Si freerdp &>/dev/null; then
+            sudo pacman -S --noconfirm freerdp
+        else
+            print_warning "xrdp not available, RDP functionality will be limited"
+        fi
+        
+        # neofetch - try different names
+        if pacman -Si neofetch &>/dev/null; then
+            sudo pacman -S --noconfirm neofetch
+        elif pacman -Si fastfetch &>/dev/null; then
+            sudo pacman -S --noconfirm fastfetch
+        else
+            print_warning "neofetch not available, using basic system info"
+        fi
         ;;
     "debian"|"ubuntu")
         print_feature "Installing Debian/Ubuntu dependencies..."
         sudo apt-get update
+        
+        # Core packages (required)
         sudo apt-get install -y \
             python3 \
             python3-pip \
@@ -169,9 +200,7 @@ case $DISTRO_ID in
             x11-utils \
             xdotool \
             imagemagick \
-            xvfb \
             x11vnc \
-            xrdp \
             fluxbox \
             procps \
             netcat-openbsd \
@@ -193,7 +222,6 @@ case $DISTRO_ID in
             gedit \
             gnome-terminal \
             htop \
-            neofetch \
             tree \
             jq \
             rsync \
@@ -208,9 +236,41 @@ case $DISTRO_ID in
             docker-compose \
             kubectl \
             helm
+        
+        # Optional packages with fallbacks
+        print_status "Installing optional packages with fallbacks..."
+        
+        # xvfb - try different package names
+        if apt-cache show xvfb &>/dev/null; then
+            sudo apt-get install -y xvfb
+        elif apt-cache show xvfb-run &>/dev/null; then
+            sudo apt-get install -y xvfb-run
+        else
+            print_warning "xvfb not available, will use xvfb-run from x11-utils"
+        fi
+        
+        # xrdp - try different package names
+        if apt-cache show xrdp &>/dev/null; then
+            sudo apt-get install -y xrdp
+        elif apt-cache show freerdp2-x11 &>/dev/null; then
+            sudo apt-get install -y freerdp2-x11
+        else
+            print_warning "xrdp not available, RDP functionality will be limited"
+        fi
+        
+        # neofetch - try different names
+        if apt-cache show neofetch &>/dev/null; then
+            sudo apt-get install -y neofetch
+        elif apt-cache show fastfetch &>/dev/null; then
+            sudo apt-get install -y fastfetch
+        else
+            print_warning "neofetch not available, using basic system info"
+        fi
         ;;
     "alpine")
         print_feature "Installing Alpine Linux dependencies..."
+        
+        # Core packages (required)
         sudo apk add --no-cache \
             python3 \
             py3-pip \
@@ -223,9 +283,7 @@ case $DISTRO_ID in
             curl \
             wget \
             unzip \
-            xvfb \
             x11vnc \
-            xrdp \
             fluxbox \
             procps \
             netcat-openbsd \
@@ -246,7 +304,6 @@ case $DISTRO_ID in
             geany \
             nano \
             htop \
-            neofetch \
             tree \
             jq \
             rsync \
@@ -260,6 +317,36 @@ case $DISTRO_ID in
             docker-compose \
             kubectl \
             helm
+        
+        # Optional packages with fallbacks
+        print_status "Installing optional packages with fallbacks..."
+        
+        # xvfb - try different package names
+        if apk search -q xvfb &>/dev/null; then
+            sudo apk add --no-cache xvfb
+        elif apk search -q xvfb-run &>/dev/null; then
+            sudo apk add --no-cache xvfb-run
+        else
+            print_warning "xvfb not available, will use xvfb-run from x11-utils"
+        fi
+        
+        # xrdp - try different package names
+        if apk search -q xrdp &>/dev/null; then
+            sudo apk add --no-cache xrdp
+        elif apk search -q freerdp &>/dev/null; then
+            sudo apk add --no-cache freerdp
+        else
+            print_warning "xrdp not available, RDP functionality will be limited"
+        fi
+        
+        # neofetch - try different names
+        if apk search -q neofetch &>/dev/null; then
+            sudo apk add --no-cache neofetch
+        elif apk search -q fastfetch &>/dev/null; then
+            sudo apk add --no-cache fastfetch
+        else
+            print_warning "neofetch not available, using basic system info"
+        fi
         ;;
     *)
         print_warning "Unknown distribution, using Debian/Ubuntu package list as fallback..."

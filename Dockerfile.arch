@@ -13,7 +13,6 @@ RUN pacman -Syu --noconfirm && \
     xorg-xdpyinfo \
     fluxbox \
     x11vnc \
-    xvfb \
     firefox \
     chromium \
     libreoffice \
@@ -33,6 +32,31 @@ RUN pacman -Syu --noconfirm && \
     ttf-liberation \
     noto-fonts \
     && pacman -Scc --noconfirm
+
+# Install optional packages with fallbacks
+RUN if pacman -Si xorg-server-xvfb &>/dev/null; then \
+        pacman -S --noconfirm xorg-server-xvfb; \
+    elif pacman -Si xvfb &>/dev/null; then \
+        pacman -S --noconfirm xvfb; \
+    else \
+        echo "xvfb not available, will use xvfb-run from xorg-server"; \
+    fi
+
+RUN if pacman -Si xrdp &>/dev/null; then \
+        pacman -S --noconfirm xrdp; \
+    elif pacman -Si freerdp &>/dev/null; then \
+        pacman -S --noconfirm freerdp; \
+    else \
+        echo "xrdp not available, RDP functionality will be limited"; \
+    fi
+
+RUN if pacman -Si neofetch &>/dev/null; then \
+        pacman -S --noconfirm neofetch; \
+    elif pacman -Si fastfetch &>/dev/null; then \
+        pacman -S --noconfirm fastfetch; \
+    else \
+        echo "neofetch not available, using basic system info"; \
+    fi
 
 # Create app user
 RUN useradd -m -s /bin/bash appuser && \
